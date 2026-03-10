@@ -19,6 +19,7 @@ namespace MSCSpannerSize
         private FsmFloat spannerSize;
         private SettingsKeybind increaseSizeKey;
         private SettingsKeybind decreaseSizeKey;
+        private Transform toolsContainer;
 
 
 
@@ -36,6 +37,31 @@ namespace MSCSpannerSize
             System.IO.File.AppendAllText(path, message + "\n");
         }
 
+        private string GetGameObjectPath(GameObject go)
+        {
+            string path = go.name;
+            Transform t = go.transform.parent;
+            while (t != null)
+            {
+                path = t.name + "/" + path;
+                t = t.parent;
+            }
+            return path;
+        }
+        private void SetSpannerInBox(float oldSize, float newSize)
+        {
+            if (toolsContainer == null) return;
+
+            int oldIndex = Mathf.RoundToInt(oldSize * 10);
+            int newIndex = Mathf.RoundToInt(newSize * 10);
+
+            Transform oldSpanner = toolsContainer.Find($"spanner({oldIndex})(Clone)");
+            Transform newSpanner = toolsContainer.Find($"spanner({newIndex})(Clone)");
+
+            if (oldSpanner != null) oldSpanner.gameObject.SetActive(true);
+            if (newSpanner != null) newSpanner.gameObject.SetActive(false);
+        }
+
         private void Mod_Settings()
         {
             debugKey = Keybind.Add("DebugKey", "Debug Game", KeyCode.Alpha9);
@@ -48,6 +74,12 @@ namespace MSCSpannerSize
         {
             globals = PlayMakerGlobals.Instance;
             spannerSize = globals.Variables.FindVariable("ToolWrenchSize") as FsmFloat;
+
+            GameObject spannerSet = GameObject.Find("spanner set(itemx)");
+            if (spannerSet != null)
+            {
+                toolsContainer = spannerSet.transform.Find("Tools");
+            }
 
         }
         private void Mod_OnGUI()
@@ -72,11 +104,49 @@ namespace MSCSpannerSize
 
             if (debugKey.GetKeybindDown())
             {
-                foreach (var v in globals.Variables.FloatVariables)
-                    LogToFile($"GLOBAL FloatVar: {v.Name.PadRight(30)} Val: {v.Value}");
+                //foreach (var v in globals.Variables.FloatVariables)
+                //    LogToFile($"GLOBAL FloatVar: {v.Name.PadRight(30)} Val: {v.Value}");
 
-                foreach (var v in globals.Variables.IntVariables)
-                    LogToFile($"GLOBAL IntVar:   {v.Name.PadRight(30)} Val: {v.Value}");
+                //foreach (var v in globals.Variables.IntVariables)
+                //    LogToFile($"GLOBAL IntVar:   {v.Name.PadRight(30)} Val: {v.Value}");
+
+                //foreach (GameObject go in GameObject.FindObjectsOfType<GameObject>())
+                //{
+                //    string lower = go.name.ToLower();
+                //    if (lower.Contains("spanner") || lower.Contains("wrench") || lower.Contains("tool") || lower.Contains("box") || lower.Contains("set"))
+                //    {
+                //        LogToFile($"[MATCH] {go.name} at path: {GetGameObjectPath(go)}");
+                //    }
+                //}
+
+                //GameObject spannerSet = GameObject.Find("spanner set(itemx)");
+                //if (spannerSet != null)
+                //{
+                //    LogToFile($"[FOUND] spanner set at: ITEMS/spanner set(itemx)");
+                //    LogToFile($"Child count: {spannerSet.transform.childCount}");
+                //    foreach (Transform child in spannerSet.transform)
+                //    {
+                //        LogToFile($"  Child: {child.name} active={child.gameObject.activeSelf}");
+                //    }
+                //}
+                //else
+                //{
+                //    LogToFile("spanner set NOT found");
+                //}
+
+                GameObject spannerSet = GameObject.Find("spanner set(itemx)");
+                if (spannerSet != null)
+                {
+                    Transform tools = spannerSet.transform.Find("Tools");
+                    if (tools != null)
+                    {
+                        LogToFile($"Tools child count: {tools.childCount}");
+                        foreach (Transform child in tools)
+                        {
+                            LogToFile($"  Child: {child.name} active={child.gameObject.activeSelf}");
+                        }
+                    }
+                }
 
             }
             
@@ -84,12 +154,16 @@ namespace MSCSpannerSize
             {
                 if (increaseSizeKey.GetKeybindDown())
                 {
-                    spannerSize.Value = Mathf.Round(Mathf.Clamp(spannerSize.Value + 0.1f, 0.5f, 1.5f) * 10) / 10f;
+                    float newSize = Mathf.Round(Mathf.Clamp(spannerSize.Value + 0.1f, 0.5f, 1.6f) * 10) / 10f;
+                    SetSpannerInBox(spannerSize.Value, newSize);
+                    spannerSize.Value = newSize;
                 }
 
                 if (decreaseSizeKey.GetKeybindDown())
                 {
-                    spannerSize.Value = Mathf.Round(Mathf.Clamp(spannerSize.Value - 0.1f, 0.5f, 1.5f) * 10) / 10f;
+                    float newSize = Mathf.Round(Mathf.Clamp(spannerSize.Value - 0.1f, 0.5f, 1.6f) * 10) / 10f;
+                    SetSpannerInBox(spannerSize.Value, newSize);
+                    spannerSize.Value = newSize;
                 }
             }
 
