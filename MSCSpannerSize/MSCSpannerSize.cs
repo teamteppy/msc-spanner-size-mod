@@ -27,7 +27,6 @@ namespace MSCSpannerSize
             SetupFunction(Setup.OnLoad, Mod_OnLoad);
             SetupFunction(Setup.OnGUI, Mod_OnGUI);
             SetupFunction(Setup.Update, Mod_Update);
-            SetupFunction(Setup.FixedUpdate, Mod_FixedUpdate);
             SetupFunction(Setup.ModSettings, Mod_Settings);
         }
 
@@ -54,7 +53,7 @@ namespace MSCSpannerSize
         private void Mod_OnGUI()
         {
             GUIStyle style = new GUIStyle();
-            style.fontSize = 40;
+            style.fontSize = 60;
             style.fontStyle = FontStyle.Bold;
             style.normal.textColor = Color.white;
             style.alignment = TextAnchor.UpperCenter;
@@ -62,11 +61,9 @@ namespace MSCSpannerSize
             //GUI.Label(new Rect(0, 20, Screen.width, 60), "Testing", style);
 
             string label;
-            if (spannerSize != null && !(spannerSize.Value == 0))
+            if (spannerSize != null && !(spannerSize.Value == 0 || spannerSize.Value == 0.55f || spannerSize.Value == 0.65f))
             {
                 label = (spannerSize.Value * 10) + "mm";
-                GUI.Label(new Rect(0, 20, Screen.width, 60), label, style);
-                label = spannerSize.Value + "mm";
                 GUI.Label(new Rect(0, 60, Screen.width, 60), label, style);
             }
         }
@@ -83,7 +80,7 @@ namespace MSCSpannerSize
 
             }
             
-            if (spannerSize != null && !(spannerSize.Value == 0))
+            if (spannerSize != null && !(spannerSize.Value == 0 || spannerSize.Value == 0.55f || spannerSize.Value == 0.65f))
             {
                 if (increaseSizeKey.GetKeybindDown())
                 {
