@@ -8,20 +8,17 @@ namespace MSCSpannerSize
     public class MSCSpannerSize : Mod
     {
         public override string ID => "MSCSpannerSize"; // Your (unique) mod ID 
-        public override string Name => "Display & Change Spanner Size"; // Your mod name
-        public override string Author => "taxi"; // Name of the Author (your name)
+        public override string Name => "Change and Show Spanner Size"; // Your mod name
+        public override string Author => "teamteppy"; // Name of the Author (your name)
         public override string Version => "1.0"; // Version
-        public override string Description => ""; // Short description of your mod 
+        public override string Description => "Keyboard shortcuts ('G', 'B') to change spanner size"; // Short description of your mod 
         public override Game SupportedGames => Game.MySummerCar;
 
         private PlayMakerGlobals globals;
-        private SettingsKeybind debugKey;
         private FsmFloat spannerSize;
         private SettingsKeybind increaseSizeKey;
         private SettingsKeybind decreaseSizeKey;
         private Transform toolsContainer;
-
-
 
         public override void ModSetup()
         {
@@ -37,17 +34,6 @@ namespace MSCSpannerSize
             System.IO.File.AppendAllText(path, message + "\n");
         }
 
-        private string GetGameObjectPath(GameObject go)
-        {
-            string path = go.name;
-            Transform t = go.transform.parent;
-            while (t != null)
-            {
-                path = t.name + "/" + path;
-                t = t.parent;
-            }
-            return path;
-        }
         private void SetSpannerInBox(float oldSize, float newSize)
         {
             if (toolsContainer == null) return;
@@ -64,10 +50,8 @@ namespace MSCSpannerSize
 
         private void Mod_Settings()
         {
-            debugKey = Keybind.Add("DebugKey", "Debug Game", KeyCode.Alpha9);
             increaseSizeKey = Keybind.Add("IncreaseSizeKey", "Increase Spanner Size", KeyCode.G);
             decreaseSizeKey = Keybind.Add("DecreaseSizeKey", "Decrease Spanner Size", KeyCode.B);
-
         }
 
         private void Mod_OnLoad()
@@ -80,7 +64,6 @@ namespace MSCSpannerSize
             {
                 toolsContainer = spannerSet.transform.Find("Tools");
             }
-
         }
         private void Mod_OnGUI()
         {
@@ -89,8 +72,6 @@ namespace MSCSpannerSize
             style.fontStyle = FontStyle.Bold;
             style.normal.textColor = Color.white;
             style.alignment = TextAnchor.UpperCenter;
-
-            //GUI.Label(new Rect(0, 20, Screen.width, 60), "Testing", style);
 
             string label;
             if (spannerSize != null && !(spannerSize.Value == 0 || spannerSize.Value == 0.55f || spannerSize.Value == 0.65f))
@@ -101,55 +82,6 @@ namespace MSCSpannerSize
         }
         private void Mod_Update()
         {
-
-            if (debugKey.GetKeybindDown())
-            {
-                //foreach (var v in globals.Variables.FloatVariables)
-                //    LogToFile($"GLOBAL FloatVar: {v.Name.PadRight(30)} Val: {v.Value}");
-
-                //foreach (var v in globals.Variables.IntVariables)
-                //    LogToFile($"GLOBAL IntVar:   {v.Name.PadRight(30)} Val: {v.Value}");
-
-                //foreach (GameObject go in GameObject.FindObjectsOfType<GameObject>())
-                //{
-                //    string lower = go.name.ToLower();
-                //    if (lower.Contains("spanner") || lower.Contains("wrench") || lower.Contains("tool") || lower.Contains("box") || lower.Contains("set"))
-                //    {
-                //        LogToFile($"[MATCH] {go.name} at path: {GetGameObjectPath(go)}");
-                //    }
-                //}
-
-                //GameObject spannerSet = GameObject.Find("spanner set(itemx)");
-                //if (spannerSet != null)
-                //{
-                //    LogToFile($"[FOUND] spanner set at: ITEMS/spanner set(itemx)");
-                //    LogToFile($"Child count: {spannerSet.transform.childCount}");
-                //    foreach (Transform child in spannerSet.transform)
-                //    {
-                //        LogToFile($"  Child: {child.name} active={child.gameObject.activeSelf}");
-                //    }
-                //}
-                //else
-                //{
-                //    LogToFile("spanner set NOT found");
-                //}
-
-                GameObject spannerSet = GameObject.Find("spanner set(itemx)");
-                if (spannerSet != null)
-                {
-                    Transform tools = spannerSet.transform.Find("Tools");
-                    if (tools != null)
-                    {
-                        LogToFile($"Tools child count: {tools.childCount}");
-                        foreach (Transform child in tools)
-                        {
-                            LogToFile($"  Child: {child.name} active={child.gameObject.activeSelf}");
-                        }
-                    }
-                }
-
-            }
-            
             if (spannerSize != null && !(spannerSize.Value == 0 || spannerSize.Value == 0.55f || spannerSize.Value == 0.65f))
             {
                 if (increaseSizeKey.GetKeybindDown())
